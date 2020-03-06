@@ -4,6 +4,7 @@ import './App.css';
 import { withStyles } from '@material-ui/core';
 import { Switch, Route, Router } from 'react-router-dom';
 import MainPage from './components/MainPage';
+import LoginPage from './components/login/login.component'
 import history from './services/history';
 
 const styles = theme => ({
@@ -19,22 +20,34 @@ const styles = theme => ({
 
 class App extends React.Component{
 
+  state={
+    login:true,
+  }
 
   componentDidMount(){
     document.title="BeautyMate"
   }
 
+  cbLoginSuccess(state){
+    this.setState({login: state});
+  }
+
+  handleChange(field, event) {
+    this.setState({ [field]: event.target.value });
+  };
+
   render(){
     const {classes} = this.props
 
     return (
-      <div className={classes.root}>
-        <Router history={history}>
-          <Switch>
-            <Route path='/' component={ MainPage } isPrivate/>
-          </Switch>
-        </Router>
-      </div>
+          this.state.login
+            ?
+            <LoginPage 
+              handleChange={this.handleChange}
+              cbLoginSuccess={this.cbLoginSuccess.bind(this)}
+            /> :
+            <MainPage/>
+          
     );
   }
 }

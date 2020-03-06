@@ -55,9 +55,6 @@ class MainPage extends React.Component {
 
     componentDidMount(){
         document.title="BeautyMate"
-        if(!axios.defaults.headers.common['Authorization']){
-            this.props.history.push("/") 
-        }
     }
     
     handleClick = () => {
@@ -109,7 +106,7 @@ class MainPage extends React.Component {
                   <Grid item xs={9} style={{paddingRight:30}}>
                       <Paper>
                           <Switch>
-                              <Route exact path='/' component={ UserList }/>
+                              {/* <Route exact path='/' component={ UserList }/> */}
                               <Route exact path='/user' component={ UserList } />
                               <Route exact path='/user/edit/:id' component={ UserEdit } />
                               <Route exact path='/product/' component={ ProductList } />
