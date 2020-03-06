@@ -93,20 +93,18 @@ class MainPage extends React.Component {
                           <ListItemText primary="Product" />
                           </ListItem>
       
-                          <ListItem button 
+                          {/* <ListItem button component={Link} to={<LoginPage />} 
                           selected={this.state.selectedIndex === 7}
                           classes={{ selected: classes.selected }}
-                          onClick={() => this.handleListItemClick(2)}
                           >
                           <ListItemText primary="LogOut" />
-                          </ListItem>
+                          </ListItem> */}
                       </List>
                       </Paper>
                   </Grid>
                   <Grid item xs={9} style={{paddingRight:30}}>
                       <Paper>
                           <Switch>
-                              {/* <Route exact path='/' component={ UserList }/> */}
                               <Route exact path='/user' component={ UserList } />
                               <Route exact path='/user/edit/:id' component={ UserEdit } />
                               <Route exact path='/product/' component={ ProductList } />

@@ -99,56 +99,39 @@ class ProductAdd extends Component {
     this.setState({
       id: product.id,
       name: product.name,
-      proce: product.price,
+      price: product.price,
       description: product.description,
       isEdit: true
     });
   }
 
   btnSaveOnClick(e){
-    e.preventDefault();
-    const {file} = this.state
-    const uploaders = file.map(file => {
-      if(file instanceof File){
-        const formData = new FormData();
-        formData.append('image', file, file.name);
-        // Make an AJAX upload request using Axios (replace Cloudinary URL below with your own)
-        return axios.post(BACKEND_URL + '/upload', formData).then(response => {
-          this.fileURL.push(response.data.fileUrl)
-        }).catch( err => {
-          // console.log(err);
-          // console.log(err.response);
-        })
-      } else {
-        this.fileURL.push(file)
-      }
-    });
-    axios.all(uploaders).then((response) => {
-      if (this.state.isEdit){
-        const obj = {
-          _id: this.state.id,
-          name: this.state.name,
-          price: this.state.price,
-          description: this.state.description,
-        };
-        axios.put(BACKEND_URL + `/Product/UpdateProduct/${this.state.id}`, obj)
-        .then(res => this.saveSuccess(res))
-        .catch(function (error) {
-          alert(error);
-        })
-      } else {
-        const obj = {
-          name: this.state.name,
-          price: this.state.price,
-          description: this.state.description,
-        };
-        axios.post(BACKEND_URL + `/Product/CreateProduct`, obj)
-        .then(res => this.saveSuccess(res))
-        .catch(function (error) {
-          alert(error);
-        })
-      }
-    });
+    if (this.state.isEdit){
+      const obj = {
+        _id: this.state.id,
+        Name: this.state.name,
+        Price: this.state.price,
+        Description : this.state.description,
+      };
+      axios.put(BACKEND_URL + `/Product/UpdateProduct/${this.state.id}`, obj)
+      .then(res => this.saveSuccess(res))
+      .catch(function (error) {
+        alert(error);
+        console.log(error.response)
+      })
+    } else {
+      const obj = {
+        Name: this.state.name,
+        Price: this.state.price,
+        Description: this.state.description,
+      };
+      axios.post(BACKEND_URL + `/Product/CreateProduct`, obj)
+      .then(res => this.saveSuccess(res))
+      .catch(function (error) {
+        alert(error);
+        console.log(error.response)
+      })
+    }
   };
   
   saveSuccess(response){
@@ -193,14 +176,10 @@ class ProductAdd extends Component {
     let that = this
     if (!files) { return; }
     if(that.state.file.length < 2) {
-      // console.log(that.state.file.length)
-      // console.log(files.length)
       const length_images = that.state.file.length + files.length
       if(length_images <= 2){
         that.setState({loadingImage : true})
         files.map(file => {
-          // console.log(file)
-          // let reader = new FileReader();
           this.fileArray.push(URL.createObjectURL(file))
           // console.log(this.state.file)
           that.setState({file : [...that.state.file, file], loadingImage: false})
@@ -217,8 +196,6 @@ class ProductAdd extends Component {
     let that = this
     that.fileArray.splice(index, 1);
     that.setState({ file: that.fileArray });
-    // console.log(that.fileArray)
-    // console.log(that.state.file)
   }
   
   btnCancelOnClick(e){
