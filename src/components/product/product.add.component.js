@@ -70,27 +70,14 @@ class ProductAdd extends Component {
   fileArray = [];
 
   state = {
-    _id: "",
+    id: "",
     name: "",
+    price: '',
     description: "",
-    type: "",
-    form: "",
-    usage_period: "",
     image: "",
-    brand: {},
     labelWidth: 0, //used to fix select's border 
     isEdit: false,
-    cannabinoid: [],
-    terpene: [],
-    form_type: [],
-    usagePeriodList: [],
-    cannabinoidList: [],
     file: [],
-    //cannabinoidList: ['THC', 'CBD', 'Other'],
-    newCannabinoid: '',
-    terpeneList: [],
-    //terpeneList: ['Myrcene', 'Limonene', 'Pinene']
-    newTerpene: '',
   }
   
   constructor(props) {
@@ -99,61 +86,23 @@ class ProductAdd extends Component {
     this.btnCancelOnClick = this.btnCancelOnClick.bind(this);
     this.uploadMultipleFiles = this.uploadMultipleFiles.bind(this)
     this.handleDrop = this.handleDrop.bind(this);
-
-    let that = this
-    if (props.match.params.brandId){
-      axios.get(BACKEND_URL + `/brand/${props.match.params.brandId}`)
-          .then(response => that.loadDataBrand(response.data))
-          .catch(err => alert(err));
+    if(this.props.location.edit){
+      axios.get(BACKEND_URL + `/Product/GetProduct/${this.props.location.productid}`)
+      .then(response => {
+        this.loadData(response.data)
+      })
+      .catch(err => alert(err));
     }
-    axios.get(BACKEND_URL + `/configuration`)
-    .then(response => this.loadDataConfig(response.data))
-    .catch(err => alert(err));
   }
 
-  loadDataConfig(data){
-    let that = this
-    that.setState({
-      form_type: data[0].form_type,
-      usagePeriodList: data[0].usage_period,
-      cannabinoidList: data[0].cannabinoid,
-      terpeneList: data[0].terpene,
+  loadData(product){
+    this.setState({
+      id: product.id,
+      name: product.name,
+      proce: product.price,
+      description: product.description,
+      isEdit: true
     });
-  }
-
-  loadDataBrand(pBrand){
-    let that = this
-    console.log(pBrand)
-    if (that.props.match.params.id){
-      let product = pBrand.products.filter(b => b._id === that.props.match.params.id)[0];
-      that.setState({
-        _id: product._id,
-        name: product.name,
-        description:product.description,
-        type: product.type,
-        form: product.form,
-        usage_period: product.usage_period,
-        cannabinoid: 
-        product.cannabinoid && product.cannabinoid.length > 0 ? 
-          product.cannabinoid : 
-          [ {name:'THC', value:''}, {name:'CBD', value:''}, ],
-        terpene: product.terpene ? product.terpene : [],
-        brand: pBrand,
-        isEdit: true,
-      });
-      if(product.image || product.image2){
-        that.fileArray.push(product.image)
-        that.setState({file : [product.image]})
-        if(product.image2){
-          that.fileArray.push(product.image2)
-          that.setState({file : [...that.state.file, product.image2]})
-        }
-      }
-    } else {
-      that.setState({
-        brand: pBrand,
-      });
-    }
   }
 
   btnSaveOnClick(e){
@@ -177,18 +126,12 @@ class ProductAdd extends Component {
     axios.all(uploaders).then((response) => {
       if (this.state.isEdit){
         const obj = {
-          _id: this.state._id,
+          _id: this.state.id,
           name: this.state.name,
+          price: this.state.price,
           description: this.state.description,
-          type: this.state.type,
-          form: this.state.form,
-          usage_period: this.state.usage_period,
-          image: this.fileURL[0] ? this.fileURL[0] : '',
-          image2: this.fileURL[1] ? this.fileURL[1] : '',
-          cannabinoid: this.state.cannabinoid,
-          terpene: this.state.terpene,
         };
-        axios.put(BACKEND_URL + `/product/${this.state.brand._id}/${this.state._id}`, obj)
+        axios.put(BACKEND_URL + `/Product/UpdateProduct/${this.state.id}`, obj)
         .then(res => this.saveSuccess(res))
         .catch(function (error) {
           alert(error);
@@ -196,16 +139,10 @@ class ProductAdd extends Component {
       } else {
         const obj = {
           name: this.state.name,
+          price: this.state.price,
           description: this.state.description,
-          type: this.state.type,
-          form: this.state.form,
-          usage_period: this.state.usage_period,
-          image: this.fileURL[0] ? this.fileURL[0] : '',
-          image2: this.fileURL[1] ? this.fileURL[1] : '',
-          cannabinoid: this.state.cannabinoid,
-          terpene: this.state.terpene,
         };
-        axios.post(BACKEND_URL + `/product/${this.state.brand._id}`, obj)
+        axios.post(BACKEND_URL + `/Product/CreateProduct`, obj)
         .then(res => this.saveSuccess(res))
         .catch(function (error) {
           alert(error);
@@ -292,62 +229,18 @@ class ProductAdd extends Component {
   handleChange = field => event => {
     this.setState({ [field]: event.target.value });
   };
-  
-  addTerpeneChip(e){
-    this.setState({
-      terpene: [...this.state.terpene.filter(t => t !== this.state.newTerpene), this.state.newTerpene],
-      newTerpene: ''
-    });
-  }
-  
-  deleteTerpene(terpene, e){
-    let newTerpene = this.state.terpene.filter(t => t !== terpene);
-    this.setState({
-      terpene: newTerpene
-    });
-  }
-
-  addCannabinoid(e){
-    this.setState({
-      cannabinoid: [
-        ...this.state.cannabinoid.filter(c => c.name !== this.state.newCannabinoid), 
-        {name:this.state.newCannabinoid, value:''}
-      ] 
-    });
-  }
-
-  deleteCannabinoid(cannabinoid, e){
-    let newCannabinoid = this.state.cannabinoid.filter(c => c.name !== cannabinoid);
-    this.setState({
-      cannabinoid: newCannabinoid
-    });
-  }
-  
-  changeCannabinoidValue(cannabinoid, e){
-    let cannabinoidList = this.state.cannabinoid.filter(c => c.name !== cannabinoid.name);
-    let cannabinoidNew = cannabinoid;
-    cannabinoidNew.value = e.target.value;
-    this.setState({
-      cannabinoid: [...cannabinoidList, cannabinoidNew] 
-    });
-  }
 
   cbSetImageNewLink(link){
     this.setState({ image: link });
   }
 
-  addDefaultSrc(ev){
-    ev.target.src = 'https://admin.cannawho.ca/static/media/logo-black-img-not-found.31ff94e5.png'
-  }
-
   render() {
 
     const { classes } = this.props;
-    console.log(this.state.form_type)
     return (
       <div>
       <Typography variant="h4" gutterBottom>
-        Add Product - Brand: {this.state.brand.name}
+        {this.state.isEdit ? 'Edit Product' : 'Add Product'}
       </Typography>
         <Grid container>
           <form className={classes.container} autoComplete="off">
@@ -357,6 +250,14 @@ class ProductAdd extends Component {
                 style={{width:'98%', marginLeft:10}}
                 value={this.state.name}
                 onChange={this.handleChange('name')}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField id="tfPrice" label="Price"
+                margin="normal" variant="outlined" required
+                style={{width:'98%', marginLeft:10}}
+                value={this.state.price}
+                onChange={this.handleChange('price')}
               />
             </Grid>
             <Grid item xs={12}>
@@ -373,7 +274,7 @@ class ProductAdd extends Component {
                   <IconButton component="label" style={{ color: '#F6227F', marginBottom: -20, marginLeft: 150}} aria-label="delete" onClick={() => this.removePhoto(index)}>
                     <CancelIcon style={{fontSize: '24px'}}/>
                   </IconButton>
-                  { this.state.loadingImage ? <CircularProgress /> : <img alt='...' onError={this.addDefaultSrc} src={url} style={{height: '200px', width: '200px', marginTop: -27}}/>}
+                  { this.state.loadingImage ? <CircularProgress /> : <img alt='...' src={url ? url : 'https://www.motorolasolutions.com/content/dam/msi/images/products/accessories/image_not_available_lg.jpg'} style={{height: '200px', width: '200px', marginTop: -27}}/>}
                 </Grid> ))}
             </Grid>
             

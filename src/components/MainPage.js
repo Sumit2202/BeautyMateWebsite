@@ -11,7 +11,7 @@ import UserList from './user/user.list.component';
 import UserEdit from './user/user.edit.component';
 import ProductList from './product/product.list.component';
 import ProductAdd from './product/product.add.component';
-// import AppBar from './components/common_components/app_bar.component'
+import AppBar from './appbar'
 import axios from 'axios';
 import { render } from '@testing-library/react';
 
@@ -72,7 +72,7 @@ class MainPage extends React.Component {
         const { classes } = this.props;
         return (
             <Router>
-              {/* <AppBar/> */}
+              <AppBar/>
               <Grid container spacing={12} style={{marginTop: '5%'}} >
                   <Grid item xs={3} style={{paddingLeft:'2%', marginRight: '-2%'}}>
                       <Paper style={{width: '80%'}}>
@@ -113,7 +113,7 @@ class MainPage extends React.Component {
                               <Route exact path='/user' component={ UserList } />
                               <Route exact path='/user/edit/:id' component={ UserEdit } />
                               <Route exact path='/product/' component={ ProductList } />
-                              <Route exact path='/product/add/:id' component={ ProductAdd } />
+                              <Route exact path='/product/add' component={ ProductAdd } />
                               <Route exact path='/product/edit/:id' component={ ProductAdd } />
                           </Switch>
                       </Paper>

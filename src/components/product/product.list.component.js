@@ -196,6 +196,12 @@ class ProductList extends Component {
               Products
             </Typography>
           </Grid>
+          
+          <Tooltip title="Add Products" aria-label="Products">
+            <IconButton aria-label="Products" className={classes.margin} component={Link} to={{pathname: `/product/add`, edit: false}}>
+              <AddIcon fontSize="small" style={{color: 'white', backgroundColor: '#000', borderRadius: 10}}/>
+            </IconButton>
+          </Tooltip>
         </Grid>
         <Table className={classes.table}>
           <TableHead>
@@ -216,13 +222,13 @@ class ProductList extends Component {
                 <CustomTableCell align="left">{product.description}</CustomTableCell>
                 <CustomTableCell align="left">
                   <Tooltip title="Edit User" aria-label="Edit">
-                    <IconButton aria-label="Edit" className={classes.margin} component={Link} to={`/product/edit/${product.id}`}>
-                      <EditIcon fontSize="small" style={{color: '#F6277F'}}/>
+                    <IconButton aria-label="Edit" className={classes.margin} component={Link} to={{pathname:`/product/edit/${product.id}`, edit: true, productid: product.id}}>
+                      <EditIcon fontSize="small" style={{color: '#000'}}/>
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="Delete User" aria-label="Delete">
                     <IconButton aria-label="Delete" className={classes.margin} onClick={this.btnDeleteOnClick.bind(this, product.id)}>
-                      <DeleteIcon fontSize="small" style={{color: '#F6277F'}}/>
+                      <DeleteIcon fontSize="small" style={{color: '#000'}}/>
                     </IconButton>
                   </Tooltip>
                 </CustomTableCell>
